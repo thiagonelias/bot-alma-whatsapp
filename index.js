@@ -408,13 +408,21 @@ async function conectarWhatsApp() {
     sock.ev.on('connection.update', async (update) => {
         const { connection, lastDisconnect, qr } = update;
 
-        if (qr && !isCloud) {
+        if (qr) {
             console.log('\n========================================');
-            console.log('   ESCANEIE O QR CODE NO TERMINAL');
+            console.log('   ESCANEIE O QR CODE');
             console.log('========================================\n');
+
+            // Mostra QR no terminal
             qrcode.generate(qr, { small: true });
-        } else if (qr && isCloud) {
-            console.log('[INFO] QR Code gerado - aguardando pairing code...');
+
+            // Gera URL para visualizar QR Code no navegador (mais facil na nuvem!)
+            const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qr)}`;
+            console.log('\n==========================================');
+            console.log('   ABRA ESSE LINK NO NAVEGADOR:');
+            console.log('==========================================');
+            console.log(`\n${qrImageUrl}\n`);
+            console.log('==========================================\n');
         }
 
         if (connection === 'close') {
