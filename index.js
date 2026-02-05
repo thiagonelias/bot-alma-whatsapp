@@ -279,10 +279,52 @@ async function baixarAudio(message) {
 }
 
 async function transcreverAudio(caminhoAudio) {
-    try {
-        console.log('[WHISPER] Transcrevendo audio...');
+    // Tenta Groq primeiro (cloud), depois Whisper local (fallback)
+    const groqApiKey = process.env.GROQ_API_KEY || '';
 
-        // Modelo e GPU configuraveis via config_bot.json
+    if (groqApiKey) {
+        // USA GROQ (CLOUD) - Funciona no Render!
+        try {
+            console.log('[GROQ] Transcrevendo audio na nuvem...');
+
+            const FormData = require('form-data');
+            const audioBuffer = fs.readFileSync(caminhoAudio);
+
+            const formData = new FormData();
+            formData.append('file', audioBuffer, {
+                filename: 'audio.ogg',
+                contentType: 'audio/ogg'
+            });
+            formData.append('model', 'whisper-large-v3');
+            formData.append('language', 'pt'); // Detecta automatico se nao especificar
+
+            const response = await axios.post('https://api.groq.com/openai/v1/audio/transcriptions', formData, {
+                headers: {
+                    'Authorization': `Bearer ${groqApiKey}`,
+                    ...formData.getHeaders()
+                },
+                maxContentLength: Infinity,
+                maxBodyLength: Infinity
+            });
+
+            const transcricao = response.data.text;
+            console.log(`[GROQ] Transcricao: ${transcricao}`);
+
+            // Limpa arquivo
+            try { fs.unlinkSync(caminhoAudio); } catch {}
+
+            return transcricao;
+
+        } catch (err) {
+            console.error('[GROQ] Erro:', err.response?.data || err.message);
+            // Se Groq falhar, tenta Whisper local
+        }
+    }
+
+    // WHISPER LOCAL (fallback para PC)
+    try {
+        console.log('[WHISPER] Transcrevendo audio localmente...');
+
         const modelo = CONFIG.modeloWhisper || 'large';
         const device = CONFIG.usarGPU ? 'cuda' : 'cpu';
         const comando = `whisper "${caminhoAudio}" --model ${modelo} --device ${device} --output_format txt --output_dir "${CONFIG.downloadsDir}"`;
