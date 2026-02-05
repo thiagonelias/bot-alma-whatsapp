@@ -64,6 +64,70 @@ if (fs.existsSync(CONFIG_BOT_FILE)) {
 });
 
 // =============================================
+// PERSISTENCIA DE SESSAO PARA RENDER
+// =============================================
+// Restaura sessao salva na variavel de ambiente (se existir)
+function restaurarSessao() {
+    const sessaoSalva = process.env.WHATSAPP_SESSION;
+    if (sessaoSalva) {
+        try {
+            const sessaoData = JSON.parse(Buffer.from(sessaoSalva, 'base64').toString('utf-8'));
+
+            // Salva os arquivos da sessao
+            for (const [filename, content] of Object.entries(sessaoData)) {
+                const filepath = path.join(CONFIG.sessionDir, filename);
+                if (typeof content === 'object') {
+                    fs.writeFileSync(filepath, JSON.stringify(content, null, 2));
+                } else {
+                    fs.writeFileSync(filepath, content);
+                }
+            }
+            console.log('[SESSAO] Restaurou sessao salva!');
+            return true;
+        } catch (err) {
+            console.error('[SESSAO] Erro ao restaurar:', err.message);
+        }
+    }
+    return false;
+}
+
+// Gera string base64 da sessao atual para salvar
+function exportarSessao() {
+    try {
+        const sessaoData = {};
+        const files = fs.readdirSync(CONFIG.sessionDir);
+
+        for (const file of files) {
+            const filepath = path.join(CONFIG.sessionDir, file);
+            const content = fs.readFileSync(filepath, 'utf-8');
+            try {
+                sessaoData[file] = JSON.parse(content);
+            } catch {
+                sessaoData[file] = content;
+            }
+        }
+
+        const base64 = Buffer.from(JSON.stringify(sessaoData)).toString('base64');
+        console.log('\n==========================================');
+        console.log('   SESSAO CONECTADA! SALVE ISSO NO RENDER:');
+        console.log('==========================================');
+        console.log('   Variavel: WHATSAPP_SESSION');
+        console.log('   Valor (copie TUDO):');
+        console.log('==========================================\n');
+        console.log(base64);
+        console.log('\n==========================================\n');
+
+        return base64;
+    } catch (err) {
+        console.error('[SESSAO] Erro ao exportar:', err.message);
+        return null;
+    }
+}
+
+// Tenta restaurar sessao ao iniciar
+restaurarSessao();
+
+// =============================================
 // CARREGA CONFIGURACOES DO BOT PYTHON
 // =============================================
 
@@ -529,6 +593,13 @@ async function conectarWhatsApp() {
         } else if (connection === 'open') {
             console.log('\n[OK] BOT CONECTADO COM SUCESSO!\n');
             console.log('[INFO] O bot esta funcionando. Aguardando mensagens...');
+
+            // Exporta sessao para salvar no Render (só mostra se não tiver sessao salva)
+            if (!process.env.WHATSAPP_SESSION) {
+                setTimeout(() => {
+                    exportarSessao();
+                }, 3000);
+            }
         }
     });
 
