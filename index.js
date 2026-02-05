@@ -606,34 +606,30 @@ async function processarMensagem(sock, msg) {
         const respostaIA = await consultarIA(numero, textoMensagem);
 
         if (respostaIA) {
-            // NOVO: Se veio de audio, responde em audio!
-            if (veioDeAudio) {
-                // Mostra "gravando audio..." enquanto gera o TTS
+            // Se veio de audio E nao esta na nuvem, responde em audio
+            const isCloud = process.env.RENDER === 'true' || process.env.GROQ_API_KEY;
+
+            if (veioDeAudio && !isCloud) {
+                // SO RESPONDE EM AUDIO NO PC LOCAL (tem edge-tts instalado)
                 await sock.sendPresenceUpdate('recording', numero);
 
                 const idioma = detectarIdioma(respostaIA);
                 const audioPath = await gerarAudioTTS(respostaIA, idioma);
 
-                // Delay de 10 segundos mostrando "gravando..." pra parecer humano
                 console.log('[BOT] Aguardando 10s antes de enviar audio...');
                 await new Promise(r => setTimeout(r, 10000));
 
-                // Para de mostrar "gravando"
                 await sock.sendPresenceUpdate('paused', numero);
 
                 if (audioPath) {
-                    // Envia como audio de voz (ptt = push to talk)
                     await sock.sendMessage(numero, {
                         audio: fs.readFileSync(audioPath),
                         mimetype: 'audio/mp4',
-                        ptt: true // Isso faz aparecer como mensagem de voz
+                        ptt: true
                     });
                     console.log(`[IA] Respondeu em AUDIO (${idioma}): ${respostaIA.substring(0, 100)}...`);
-
-                    // Limpa o arquivo de audio
                     try { fs.unlinkSync(audioPath); } catch {}
                 } else {
-                    // Fallback: se falhar TTS, envia texto
                     await sock.sendMessage(numero, { text: respostaIA });
                     console.log(`[IA] Respondeu em TEXTO (TTS falhou): ${respostaIA.substring(0, 100)}...`);
                 }
