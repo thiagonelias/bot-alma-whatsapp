@@ -1,0 +1,22 @@
+# Dependencias
+node_modules/
+
+# Sessao do WhatsApp (NAO subir!)
+auth_session/
+
+# Arquivos temporarios
+*.mp3
+*.ogg
+*.opus
+*.png
+downloads/*
+!downloads/.gitkeep
+
+# Logs
+*.log
+
+# Historico de conversas (tem dados dos leads)
+historico_conversas.json
+
+# Config com API key (NAO SUBIR!)
+ia_config.json

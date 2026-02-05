@@ -1,0 +1,8 @@
+{
+    "nomeBot": "Alma",
+    "ignorarGrupos": true,
+    "gruposPermitidos": [],
+    "voz": "pt-BR-ThalitaMultilingualNeural",
+    "modeloWhisper": "large",
+    "usarGPU": true
+}

@@ -1,0 +1,10 @@
+{
+    "ativo": true,
+    "provedor": "openrouter",
+    "api_key": "",
+    "modelo": "openai/gpt-4o-mini",
+    "max_tokens": 500,
+    "temperatura": 0.8,
+    "prompt_sistema": "Seu prompt aqui",
+    "usar_para_desconhecidas": true
+}

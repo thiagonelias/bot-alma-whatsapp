@@ -1,0 +1,261 @@
+{
+    "CHECKLIST": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": ["Checklist_24_Horas.pdf"],
+        "audio": "checklist.ogg",
+        "ativo": true
+    },
+    "CHEKLIST": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": ["Checklist_24_Horas.pdf"],
+        "audio": "checklist.ogg",
+        "ativo": true
+    },
+    "LISTA": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": ["Checklist_24_Horas.pdf"],
+        "audio": "checklist.ogg",
+        "ativo": true
+    },
+    "24HORAS": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": ["Checklist_24_Horas.pdf"],
+        "audio": "checklist.ogg",
+        "ativo": true
+    },
+    "24H": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": ["Checklist_24_Horas.pdf"],
+        "audio": "checklist.ogg",
+        "ativo": true
+    },
+    "SENALES": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": ["7_Senales_Disculpa_Falsa.pdf"],
+        "audio": "senales.ogg",
+        "ativo": true
+    },
+    "SINAIS": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": ["7_Senales_Disculpa_Falsa.pdf"],
+        "audio": "senales.ogg",
+        "ativo": true
+    },
+    "SIGNS": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": ["7_Senales_Disculpa_Falsa.pdf"],
+        "audio": "senales.ogg",
+        "ativo": true
+    },
+    "DISCULPA": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": ["7_Senales_Disculpa_Falsa.pdf"],
+        "audio": "senales.ogg",
+        "ativo": true
+    },
+    "DESCULPA": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": ["7_Senales_Disculpa_Falsa.pdf"],
+        "audio": "senales.ogg",
+        "ativo": true
+    },
+    "7SENALES": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": ["7_Senales_Disculpa_Falsa.pdf"],
+        "audio": "senales.ogg",
+        "ativo": true
+    },
+    "7SINAIS": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": ["7_Senales_Disculpa_Falsa.pdf"],
+        "audio": "senales.ogg",
+        "ativo": true
+    },
+    "MENSAJE": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": ["Mensaje_No_Enviar.pdf"],
+        "audio": "mensaje.ogg",
+        "ativo": true
+    },
+    "MENSAGEM": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": ["Mensaje_No_Enviar.pdf"],
+        "audio": "mensaje.ogg",
+        "ativo": true
+    },
+    "MESSAGE": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": ["Mensaje_No_Enviar.pdf"],
+        "audio": "mensaje.ogg",
+        "ativo": true
+    },
+    "NOENVIAR": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": ["Mensaje_No_Enviar.pdf"],
+        "audio": "mensaje.ogg",
+        "ativo": true
+    },
+    "NAOENVIAR": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": ["Mensaje_No_Enviar.pdf"],
+        "audio": "mensaje.ogg",
+        "ativo": true
+    },
+    "CUADERNO": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": true
+    },
+    "CADERNO": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": true
+    },
+    "WORKBOOK": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": true
+    },
+    "14DIAS": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": true
+    },
+    "14DAYS": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": true
+    },
+    "DECISION": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": true
+    },
+    "DECISAO": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": true
+    },
+    "MEQUEDO": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": true
+    },
+    "FICO": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": true
+    },
+    "BUNDLE": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": true
+    },
+    "PACOTE": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": true
+    },
+    "PAQUETE": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": true
+    },
+    "TODO": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": true
+    },
+    "TUDO": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": true
+    },
+    "MENU": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": true
+    },
+    "AYUDA": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": true
+    },
+    "AJUDA": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": true
+    },
+    "HELP": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": true
+    },
+    "INICIO": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": true
+    },
+    "HOLA": {
+        "tipo": "simples",
+        "mensagem": "",
+        "arquivos": [],
+        "audio": "",
+        "ativo": false
+    }
+}
