@@ -427,13 +427,34 @@ async function conectarWhatsApp() {
 
         if (connection === 'close') {
             const statusCode = lastDisconnect?.error?.output?.statusCode;
-            const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
-            console.log(`[CONEXAO] Desconectado. Status: ${statusCode}`);
-            if (shouldReconnect) {
+            const reason = lastDisconnect?.error?.output?.payload?.message || 'desconhecido';
+            console.log(`[CONEXAO] Desconectado. Status: ${statusCode}, Motivo: ${reason}`);
+
+            // Sempre tenta reconectar, exceto se fez logout manual
+            if (statusCode === DisconnectReason.loggedOut) {
+                console.log('[CONEXAO] Logout manual detectado. Deletando sessao...');
+                // Deleta a sessao para forcar novo QR code
+                try {
+                    fs.rmSync(CONFIG.sessionDir, { recursive: true, force: true });
+                    console.log('[CONEXAO] Sessao deletada. Reiniciando em 5s...');
+                } catch (e) {}
+                setTimeout(conectarWhatsApp, 5000);
+            } else if (statusCode === 401) {
+                // 401 = sessao invalida, precisa de novo QR
+                console.log('[CONEXAO] Sessao invalida (401). Deletando sessao...');
+                try {
+                    fs.rmSync(CONFIG.sessionDir, { recursive: true, force: true });
+                    console.log('[CONEXAO] Sessao deletada. Reiniciando em 5s...');
+                } catch (e) {}
+                setTimeout(conectarWhatsApp, 5000);
+            } else {
+                // Outros erros (503, etc): apenas reconecta
+                console.log('[CONEXAO] Reconectando em 5s...');
                 setTimeout(conectarWhatsApp, 5000);
             }
         } else if (connection === 'open') {
-            console.log('\n[OK] BOT CONECTADO!\n');
+            console.log('\n[OK] BOT CONECTADO COM SUCESSO!\n');
+            console.log('[INFO] O bot esta funcionando. Aguardando mensagens...');
         }
     });
 
@@ -639,3 +660,37 @@ console.log('========================================\n');
 carregarConfiguracoes();
 carregarHistorico();
 conectarWhatsApp();
+
+// =============================================
+// KEEP-ALIVE PARA RENDER (evita que o processo morra)
+// =============================================
+if (process.env.RENDER === 'true') {
+    console.log('[RENDER] Modo cloud ativado - Keep-alive ligado');
+
+    // Pinga a cada 5 minutos para manter o processo vivo
+    setInterval(() => {
+        console.log(`[KEEP-ALIVE] ${new Date().toISOString()} - Bot rodando...`);
+    }, 5 * 60 * 1000);
+}
+
+// Mantém o processo Node.js rodando
+process.on('SIGINT', () => {
+    console.log('\n[EXIT] Bot encerrado pelo usuario');
+    process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+    console.log('\n[EXIT] Bot encerrado pelo sistema');
+    process.exit(0);
+});
+
+// Evita que erros nao tratados matem o processo
+process.on('uncaughtException', (err) => {
+    console.error('[ERRO CRITICO]', err.message);
+    // Nao sai do processo, deixa reconectar
+});
+
+process.on('unhandledRejection', (reason) => {
+    console.error('[PROMISE REJEITADA]', reason);
+    // Nao sai do processo, deixa reconectar
+});
