@@ -225,16 +225,28 @@ function detectarIdioma(texto) {
     return 'en';
 }
 
+// Sistema de rotacao de API keys do ElevenLabs
+let elevenLabsKeyIndex = 0;
+function getElevenLabsKey() {
+    // Suporta uma key ou multiplas separadas por virgula
+    const keys = (process.env.ELEVENLABS_API_KEYS || process.env.ELEVENLABS_API_KEY || '').split(',').filter(k => k.trim());
+    if (keys.length === 0) return null;
+
+    // Rotaciona entre as keys
+    const key = keys[elevenLabsKeyIndex % keys.length].trim();
+    elevenLabsKeyIndex++;
+    return key;
+}
+
 async function gerarAudioTTS(texto, idioma) {
-    const elevenLabsKey = process.env.ELEVENLABS_API_KEY || '';
+    const elevenLabsKey = getElevenLabsKey();
 
     // USA ELEVENLABS (CLOUD) - Funciona no Render!
     if (elevenLabsKey) {
         try {
-            console.log(`[ELEVENLABS] Gerando audio em ${idioma}...`);
+            console.log(`[ELEVENLABS] Gerando audio em ${idioma}... (Key ${elevenLabsKeyIndex})`);
 
             // Voz feminina brasileira natural
-            // Outras vozes: https://api.elevenlabs.io/v1/voices
             const voiceId = 'EXAVITQu4vr4xnSDxMaL'; // Sarah - feminina, natural
 
             const response = await axios.post(
@@ -265,8 +277,14 @@ async function gerarAudioTTS(texto, idioma) {
             return caminhoArquivo;
 
         } catch (err) {
-            console.error('[ELEVENLABS] Erro:', err.response?.data || err.message);
-            // Se falhar, tenta Edge TTS local
+            const errorMsg = err.response?.data?.toString() || err.message;
+            console.error('[ELEVENLABS] Erro:', errorMsg);
+
+            // Se erro de quota, tenta proxima key
+            if (errorMsg.includes('quota') || errorMsg.includes('limit')) {
+                console.log('[ELEVENLABS] Quota esgotada, tentando proxima key...');
+                return gerarAudioTTS(texto, idioma); // Recursivo com proxima key
+            }
         }
     }
 
