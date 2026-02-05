@@ -303,25 +303,54 @@ function getElevenLabsKey() {
 }
 
 async function gerarAudioTTS(texto, idioma) {
-    const elevenLabsKey = getElevenLabsKey();
+    // USA OPENAI TTS (via API direta) - Funciona no Render!
+    const openaiKey = process.env.OPENAI_API_KEY || '';
 
-    // USA ELEVENLABS (CLOUD) - Funciona no Render!
-    if (elevenLabsKey) {
+    if (openaiKey) {
         try {
-            console.log(`[ELEVENLABS] Gerando audio em ${idioma}... (Key ${elevenLabsKeyIndex})`);
-
-            // Voz feminina brasileira natural
-            const voiceId = 'EXAVITQu4vr4xnSDxMaL'; // Sarah - feminina, natural
+            console.log(`[OPENAI-TTS] Gerando audio em ${idioma}...`);
 
             const response = await axios.post(
-                `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+                'https://api.openai.com/v1/audio/speech',
+                {
+                    model: 'tts-1',
+                    input: texto,
+                    voice: 'nova', // nova = feminina, natural
+                    response_format: 'mp3'
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${openaiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    responseType: 'arraybuffer'
+                }
+            );
+
+            const nomeArquivo = `resposta_${Date.now()}.mp3`;
+            const caminhoArquivo = path.join(CONFIG.downloadsDir, nomeArquivo);
+            fs.writeFileSync(caminhoArquivo, response.data);
+
+            console.log(`[OPENAI-TTS] Audio gerado: ${caminhoArquivo}`);
+            return caminhoArquivo;
+
+        } catch (err) {
+            console.error('[OPENAI-TTS] Erro:', err.response?.data || err.message);
+        }
+    }
+
+    // ELEVENLABS (backup)
+    const elevenLabsKey = getElevenLabsKey();
+    if (elevenLabsKey) {
+        try {
+            console.log(`[ELEVENLABS] Gerando audio em ${idioma}...`);
+
+            const response = await axios.post(
+                `https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL`,
                 {
                     text: texto,
                     model_id: 'eleven_multilingual_v2',
-                    voice_settings: {
-                        stability: 0.5,
-                        similarity_boost: 0.75
-                    }
+                    voice_settings: { stability: 0.5, similarity_boost: 0.75 }
                 },
                 {
                     headers: {
@@ -341,14 +370,7 @@ async function gerarAudioTTS(texto, idioma) {
             return caminhoArquivo;
 
         } catch (err) {
-            const errorMsg = err.response?.data?.toString() || err.message;
-            console.error('[ELEVENLABS] Erro:', errorMsg);
-
-            // Se erro de quota, tenta proxima key
-            if (errorMsg.includes('quota') || errorMsg.includes('limit')) {
-                console.log('[ELEVENLABS] Quota esgotada, tentando proxima key...');
-                return gerarAudioTTS(texto, idioma); // Recursivo com proxima key
-            }
+            console.error('[ELEVENLABS] Erro:', err.response?.data?.toString() || err.message);
         }
     }
 
