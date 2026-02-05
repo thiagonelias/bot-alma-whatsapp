@@ -226,15 +226,58 @@ function detectarIdioma(texto) {
 }
 
 async function gerarAudioTTS(texto, idioma) {
-    try {
-        console.log(`[TTS] Gerando audio em ${idioma}...`);
+    const elevenLabsKey = process.env.ELEVENLABS_API_KEY || '';
 
-        // Voz configuravel via config_bot.json
+    // USA ELEVENLABS (CLOUD) - Funciona no Render!
+    if (elevenLabsKey) {
+        try {
+            console.log(`[ELEVENLABS] Gerando audio em ${idioma}...`);
+
+            // Voz feminina brasileira natural
+            // Outras vozes: https://api.elevenlabs.io/v1/voices
+            const voiceId = 'EXAVITQu4vr4xnSDxMaL'; // Sarah - feminina, natural
+
+            const response = await axios.post(
+                `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+                {
+                    text: texto,
+                    model_id: 'eleven_multilingual_v2',
+                    voice_settings: {
+                        stability: 0.5,
+                        similarity_boost: 0.75
+                    }
+                },
+                {
+                    headers: {
+                        'Accept': 'audio/mpeg',
+                        'Content-Type': 'application/json',
+                        'xi-api-key': elevenLabsKey
+                    },
+                    responseType: 'arraybuffer'
+                }
+            );
+
+            const nomeArquivo = `resposta_${Date.now()}.mp3`;
+            const caminhoArquivo = path.join(CONFIG.downloadsDir, nomeArquivo);
+            fs.writeFileSync(caminhoArquivo, response.data);
+
+            console.log(`[ELEVENLABS] Audio gerado: ${caminhoArquivo}`);
+            return caminhoArquivo;
+
+        } catch (err) {
+            console.error('[ELEVENLABS] Erro:', err.response?.data || err.message);
+            // Se falhar, tenta Edge TTS local
+        }
+    }
+
+    // EDGE TTS LOCAL (fallback para PC)
+    try {
+        console.log(`[TTS] Gerando audio localmente em ${idioma}...`);
+
         const voz = CONFIG.voz || 'pt-BR-ThalitaMultilingualNeural';
         const nomeArquivo = `resposta_${Date.now()}.mp3`;
         const caminhoArquivo = path.join(CONFIG.downloadsDir, nomeArquivo);
 
-        // Escapa aspas no texto
         const textoEscapado = texto.replace(/"/g, '\\"');
 
         const comando = `edge-tts --voice "${voz}" --text "${textoEscapado}" --write-media "${caminhoArquivo}"`;
@@ -609,8 +652,8 @@ async function processarMensagem(sock, msg) {
             // Se veio de audio E nao esta na nuvem, responde em audio
             const isCloud = process.env.RENDER === 'true' || process.env.GROQ_API_KEY;
 
-            if (veioDeAudio && !isCloud) {
-                // SO RESPONDE EM AUDIO NO PC LOCAL (tem edge-tts instalado)
+            if (veioDeAudio) {
+                // Responde em audio (ElevenLabs na nuvem ou Edge TTS local)
                 await sock.sendPresenceUpdate('recording', numero);
 
                 const idioma = detectarIdioma(respostaIA);
