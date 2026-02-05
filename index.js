@@ -616,12 +616,7 @@ async function conectarWhatsApp() {
             console.log('\n[OK] BOT CONECTADO COM SUCESSO!\n');
             console.log('[INFO] O bot esta funcionando. Aguardando mensagens...');
 
-            // Exporta sessao para salvar no Render (só mostra se não tiver sessao salva)
-            if (!process.env.WHATSAPP_SESSION) {
-                setTimeout(() => {
-                    exportarSessao();
-                }, 3000);
-            }
+            // Sessao exportada desativada - causava conflitos
         }
     });
 
