@@ -430,28 +430,26 @@ async function conectarWhatsApp() {
             const reason = lastDisconnect?.error?.output?.payload?.message || 'desconhecido';
             console.log(`[CONEXAO] Desconectado. Status: ${statusCode}, Motivo: ${reason}`);
 
-            // Sempre tenta reconectar, exceto se fez logout manual
-            if (statusCode === DisconnectReason.loggedOut) {
-                console.log('[CONEXAO] Logout manual detectado. Deletando sessao...');
-                // Deleta a sessao para forcar novo QR code
+            // 401 = sessao invalida, deleta e recria
+            // 515 = stream error, apenas reconecta
+            // 503 = erro temporario, apenas reconecta
+            // loggedOut = logout manual, deleta e recria
+
+            const needsNewSession = statusCode === DisconnectReason.loggedOut || statusCode === 401;
+
+            if (needsNewSession) {
+                console.log('[CONEXAO] Sessao invalida. Criando nova sessao...');
                 try {
                     fs.rmSync(CONFIG.sessionDir, { recursive: true, force: true });
-                    console.log('[CONEXAO] Sessao deletada. Reiniciando em 5s...');
                 } catch (e) {}
-                setTimeout(conectarWhatsApp, 5000);
-            } else if (statusCode === 401) {
-                // 401 = sessao invalida, precisa de novo QR
-                console.log('[CONEXAO] Sessao invalida (401). Deletando sessao...');
-                try {
-                    fs.rmSync(CONFIG.sessionDir, { recursive: true, force: true });
-                    console.log('[CONEXAO] Sessao deletada. Reiniciando em 5s...');
-                } catch (e) {}
-                setTimeout(conectarWhatsApp, 5000);
+                // Recria a pasta antes de reconectar
+                fs.mkdirSync(CONFIG.sessionDir, { recursive: true });
+                console.log('[CONEXAO] Reiniciando em 5s...');
             } else {
-                // Outros erros (503, etc): apenas reconecta
-                console.log('[CONEXAO] Reconectando em 5s...');
-                setTimeout(conectarWhatsApp, 5000);
+                console.log('[CONEXAO] Erro temporario. Reconectando em 5s...');
             }
+
+            setTimeout(conectarWhatsApp, 5000);
         } else if (connection === 'open') {
             console.log('\n[OK] BOT CONECTADO COM SUCESSO!\n');
             console.log('[INFO] O bot esta funcionando. Aguardando mensagens...');
