@@ -373,55 +373,28 @@ async function conectarWhatsApp() {
     const { version, isLatest } = await fetchLatestBaileysVersion();
     console.log(`[INFO] Usando WA v${version.join('.')}, isLatest: ${isLatest}`);
 
-    // Detecta se esta rodando no Render (nuvem) ou local
-    const isCloud = process.env.RENDER === 'true' || process.env.OPENROUTER_API_KEY;
-    const phoneNumber = process.env.PHONE_NUMBER || ''; // Numero para pairing code
-
     const sock = makeWASocket({
         version,
         auth: state,
         logger,
         browser: ['Chrome', 'Windows', '10.0'],
         syncFullHistory: false,
-        printQRInTerminal: !isCloud // So mostra QR se for local
+        printQRInTerminal: false // Desativado - usamos URL
     });
-
-    // Se estiver na nuvem e tiver numero configurado, usa Pairing Code
-    if (isCloud && phoneNumber && !state.creds.registered) {
-        setTimeout(async () => {
-            try {
-                const code = await sock.requestPairingCode(phoneNumber);
-                console.log('\n========================================');
-                console.log('   CODIGO DE PAREAMENTO (PAIRING CODE)');
-                console.log('========================================');
-                console.log(`\n   SEU CODIGO: ${code}\n`);
-                console.log('   Va no WhatsApp > Aparelhos conectados');
-                console.log('   > Conectar aparelho > Conectar com numero');
-                console.log('   > Digite o codigo acima');
-                console.log('========================================\n');
-            } catch (err) {
-                console.log('[ERRO] Pairing code:', err.message);
-            }
-        }, 3000);
-    }
 
     sock.ev.on('connection.update', async (update) => {
         const { connection, lastDisconnect, qr } = update;
 
         if (qr) {
-            console.log('\n========================================');
-            console.log('   ESCANEIE O QR CODE');
-            console.log('========================================\n');
-
-            // Mostra QR no terminal
-            qrcode.generate(qr, { small: true });
-
-            // Gera URL para visualizar QR Code no navegador (mais facil na nuvem!)
+            // Gera URL para visualizar QR Code no navegador
             const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qr)}`;
             console.log('\n==========================================');
-            console.log('   ABRA ESSE LINK NO NAVEGADOR:');
+            console.log('   ESCANEIE O QR CODE (ABRA O LINK):');
             console.log('==========================================');
             console.log(`\n${qrImageUrl}\n`);
+            console.log('==========================================');
+            console.log('   O QR CODE MUDA A CADA 60 SEGUNDOS!');
+            console.log('   Se expirar, um novo link aparecera.');
             console.log('==========================================\n');
         }
 
